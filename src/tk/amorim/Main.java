@@ -1,5 +1,8 @@
 package tk.amorim;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -19,8 +22,8 @@ public class Main {
     //region Allocation
     public static int[] allocation_id = new int[MAX];
     public static String[] allocation_status = new String[MAX];
-    public static Date[][] allocation_startDate = new Date[MAX][MAX];
-    public static Date[][] allocation_endDate = new Date[MAX][MAX];
+    public static Date[] allocation_startDate = new Date[MAX];
+    public static Date[] allocation_endDate = new Date[MAX];
     public static int[] allocation_activity_id = new int[MAX];
     public static int[] allocation_resource_id = new int[MAX];
     public static int[] allocation_resource_owner_id = new int[MAX];
@@ -37,9 +40,9 @@ public class Main {
     //endregion
 
     //region Activity
-    public static int[] activity_id;
-    public static String[] activity_title;
-    public static String[] activity_desc;
+    public static int[] activity_id = new int[MAX];
+    public static String[] activity_title = new String[MAX];
+    public static String[] activity_desc = new String[MAX];
     public static int activities_size;
     public static AtomicInteger activity_ids_control = new AtomicInteger(1000);
     //endregion
@@ -102,12 +105,113 @@ public class Main {
             newAllocation();
         }
         else {
-            manageAllocation();
+            //manageAllocation();
         }
     }
-
+    static int findById(int id, int[] array, int tam) {
+        for (int i = 0; i < tam; i++) {
+            if (array[i] == id)
+                return i;
+        }
+        return -1;
+    }
+    static boolean checkForPrivilegedUsers() {
+        for (int role : user_role) {
+            if (role > 1)
+                return true;
+        }
+        return false;
+    }
+    static boolean checkIfDateCollides(Date startA, Date endA, int resourceID) {
+        for (int i = 0; i < allocations_size; i++) {
+            if (allocation_resource_id[i] == resourceID) {
+                Date startB = allocation_startDate[i];
+                Date endB = allocation_endDate[i];
+                if ((startA.before(endB) || startA.equals(endB)) && ((endA.after(startB)) || endA.equals(startB))) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
     static void newAllocation() {
-
+        System.out.println("\n\n\nNova Alocação\n\n\n");
+        if (activities_size == 0) {
+            System.out.println("Ocorreu um erro: não há atividades cadastradas, impossível alocar.");
+            return;
+        }
+        if (resources_size == 0) {
+            System.out.println("Ocorreu um erro: não há recursos cadastrados, impossível alocar.");
+            return;
+        }
+        if (users_size == 0 || !checkForPrivilegedUsers()) {
+            System.out.println("Ocorreu um erro: não há usuários aptos para alocar.");
+            return;
+        }
+        System.out.println("Favor escolher a identificação da atividade a qual o recurso será alocado: \n");
+        for (int i = 0; i < activities_size; i++) {
+            System.out.println(activity_id[i] + " - " + activity_title[i]);
+        }
+        System.out.println("\n\n");
+        int idActivity = scanner.nextInt();
+        int locActivity = findById(idActivity, activity_id, activities_size);
+        System.out.println("Escolher a identificação do recurso a ser alocado: \n");
+        for (int i = 0; i < resources_size; i++) {
+            System.out.println(resource_id[i] + " - " + resource_name[i]);
+        }
+        System.out.println("\n\n");
+        int idResource = scanner.nextInt();
+        int locResource = findById(idResource, resource_id, resources_size);
+        System.out.println("Escolha agora a identificação do usuário responsável por essa alocação (somente são exibidos professores e pesquisadores):\n");
+        for (int i = 0; i < resources_size; i++) {
+            if (user_role[i] > 1) {
+                System.out.println(user_id[i] + " - " + user_name[i]);
+            }
+        }
+        System.out.println("\n\n");
+        int idUser = scanner.nextInt();
+        scanner.nextLine();
+        int locUser = findById(idUser, user_id, users_size);
+        Date inicio = null, fim = null;
+        while (true) {
+            System.out.println("Agora informe a data de início da alocação (DD/MM/AAAA HH:MM):\n");
+            String dataInicio = scanner.nextLine();
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+            try {
+                inicio = sdf.parse(dataInicio);
+            } catch (ParseException e) {
+                e.printStackTrace();
+                return;
+            }
+            System.out.println("A data de fim da alocação (DD/MM/AAAA HH:MM):\n");
+            String dataFim = scanner.nextLine();
+            try {
+                fim = sdf.parse(dataFim);
+            } catch (ParseException e) {
+                e.printStackTrace();
+                return;
+            }
+            if (checkIfDateCollides(inicio, fim, idResource)) {
+                System.out.println("Esse recurso já está alocado no horário selecionado. Deseja tentar outro horário? (S/N)");
+                String go = scanner.nextLine();
+                if (go.equals("N"))
+                    return;
+            }
+            else
+                break;
+        }
+        int id = allocation_ids_control.getAndIncrement();
+        allocation_id[allocations_size] = id;
+        allocation_resource_id[allocations_size] = idResource;
+        allocation_activity_id[allocations_size] = idActivity;
+        allocation_startDate[allocations_size] = inicio;
+        allocation_endDate[allocations_size] = fim;
+        allocation_status[allocations_size] = "teste";
+        allocations_size++;
+        System.out.println("\n\nA alocação foi feita com sucesso.\nFoi gerada a identificação " + id + ".\n");
+        System.out.println("\nPressione ENTER para retornar ao Menu Principal");
+        scanner.nextLine();
+        System.out.println("\n\n");
     }
     public static void main(String[] args) {
         boolean exit = false;
