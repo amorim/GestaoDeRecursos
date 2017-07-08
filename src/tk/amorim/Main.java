@@ -2,13 +2,12 @@ package tk.amorim;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Main {
-    static Scanner scanner = new Scanner(System.in);
+    static Scanner scanner;
 
     static int MAX = 10000;
 
@@ -34,6 +33,7 @@ public class Main {
     //region User
     public static int[] user_id = new int[MAX];
     public static String[] user_name = new String[MAX];
+    public static String[] user_email = new String[MAX];
     public static int[] user_role = new int[MAX];
     public static int users_size;
     public static AtomicInteger user_ids_control = new AtomicInteger(1000);
@@ -43,23 +43,30 @@ public class Main {
     public static int[] activity_id = new int[MAX];
     public static String[] activity_title = new String[MAX];
     public static String[] activity_desc = new String[MAX];
+    public static int[][] activity_users = new int[MAX][MAX];
+    public static int[] activity_type = new int[MAX];
+    public static int activity_users_size;
     public static int activities_size;
     public static AtomicInteger activity_ids_control = new AtomicInteger(1000);
     //endregion
 
     static int displayMenu() {
-        System.out.println("Bem-vindo ao sistema\n\n\nEscolha uma opção:\n\n1. Cadastro de Usuários\n2. Criar uma Atividade\n3. Cadastrar um recurso\n4. Alocações\n5. Sair\n\n");
+        System.out.println("Bem-vindo ao sistema\n\n\nEscolha uma opção:\n\n1. Cadastro de Usuários\n2. Criar uma Atividade\n3. Cadastrar um recurso\n4. Alocações\n5. Consulta Usuário\n6. Consulta Recurso\n7. Emitir Relatório\n8. Sair\n\n");
         return scanner.nextInt();
     }
+
     static void registerUser() {
         System.out.print("\n\n\nCadastro de Usuário\n\n\nFavor informar o nome do usuário:\n");
         String username = scanner.nextLine();
-        System.out.print("Favor informar o tipo de usuário (1 para aluno, 2 para professor, 3 para pesquisador):\n");
+        System.out.println("Informe o e-mail do usuário:");
+        String email = scanner.nextLine();
+        System.out.print("Favor informar o tipo de usuário (1 para aluno, 2 para professor, 3 para pesquisador):");
         int role = scanner.nextInt();
         int id = user_ids_control.getAndIncrement();
         user_id[users_size] = id;
         user_name[users_size] = username;
         user_role[users_size] = role;
+        user_email[users_size] = email;
         users_size++;
         System.out.println("\n\nUsuário " + username + " cadastrado com sucesso. \nFoi gerada a identificação " + id + ". \nVocê pode obter essa identificação posteriormente pelo sistema de busca.");
         System.out.println("\nPressione ENTER para retornar ao Menu Principal");
@@ -67,15 +74,51 @@ public class Main {
         scanner.nextLine();
         System.out.println("\n\n");
     }
+
+    static boolean checkIfUserIsAlreadyAdded(int id) {
+        for (int i = 0; i < activity_users_size; i++) {
+            if (activity_users[activities_size][i] == id)
+                return true;
+        }
+        return false;
+    }
+
     static void createActivity() {
+        if (users_size == 0) {
+            System.out.println("\n\nOcorreu um erro: não há usuários cadastrados no sistema, não é possível cadastrar uma atividade.\n\n");
+            return;
+        }
         System.out.println("\n\n\nCriar uma Atividade\n\n\nInformar título da atividade:\n");
         String title = scanner.nextLine();
-        System.out.println("Informar breve descrição da atividade:\n");
+        System.out.println("Informar breve descrição da atividade: \n");
         String desc = scanner.nextLine();
+        System.out.println("Qual o tipo da atividade? (1 para aula tradicional, 2 para apresentações e 3 para laboratório)");
+        int type = scanner.nextInt();
+        System.out.println("Selecione agora os usuários que participarão dessa atividade:\n");
+        while (true) {
+            System.out.println();
+            for (int i = 0; i < users_size; i++) {
+                System.out.println(user_id[i] + " - " + user_name[i]);
+            }
+            System.out.println("\nInsira o ID desejado:");
+            int id = scanner.nextInt();
+            if (checkIfUserIsAlreadyAdded(id)) {
+                System.out.println("Este usuário já está adicionado nessa atividade.");
+            } else {
+                activity_users[activities_size][activity_users_size++] = id;
+            }
+            scanner.nextLine();
+            System.out.println("Adicionar mais usuários? (S/N)\n");
+            if (scanner.nextLine().equals("N")) {
+                break;
+            }
+        }
+
         int id = activity_ids_control.getAndIncrement();
         activity_id[activities_size] = id;
         activity_title[activities_size] = title;
         activity_desc[activities_size] = desc;
+        activity_type[activities_size] = type;
         activities_size++;
         System.out.println("\n\nAtividade \"" + title + "\" cadastrada com sucesso.\nFoi gerada a identificação " + id + ".\n");
         System.out.println("Você deseja alocar recursos para essa atividade? (S/N)\n");
@@ -83,6 +126,7 @@ public class Main {
             newAllocation();
         }
     }
+
     static void registerResource() {
         System.out.println("\n\n\nCadastrar um Recurso\n\n\nInformar o nome do recurso:\n");
         String name = scanner.nextLine();
@@ -95,6 +139,7 @@ public class Main {
         scanner.nextLine();
         System.out.println("\n\n");
     }
+
     static void allocation() {
         System.out.println("\n\n\nBem-Vindo ao Menu de Alocações.\n\n\n");
         System.out.println("Escolha uma opção:\n\n");
@@ -103,11 +148,11 @@ public class Main {
         scanner.nextLine();
         if (option == 1) {
             newAllocation();
-        }
-        else {
+        } else {
             //manageAllocation();
         }
     }
+
     static int findById(int id, int[] array, int tam) {
         for (int i = 0; i < tam; i++) {
             if (array[i] == id)
@@ -115,6 +160,7 @@ public class Main {
         }
         return -1;
     }
+
     static boolean checkForPrivilegedUsers() {
         for (int role : user_role) {
             if (role > 1)
@@ -122,15 +168,26 @@ public class Main {
         }
         return false;
     }
-    static boolean checkIfDateCollides(Date startA, Date endA, int resourceID) {
+
+    static boolean checkIfDateCollides(Date startA, Date endA, int id, int array[]) {
         for (int i = 0; i < allocations_size; i++) {
-            if (allocation_resource_id[i] == resourceID) {
+            if (array[i] == id) {
                 Date startB = allocation_startDate[i];
                 Date endB = allocation_endDate[i];
                 if ((startA.before(endB) || startA.equals(endB)) && ((endA.after(startB)) || endA.equals(startB))) {
                     return true;
                 }
             }
+        }
+        return false;
+    }
+    static boolean checkUserAvailability(int id) {
+        int idx = activity_type[findById(id, activity_id, activities_size)];
+        for (int i = 0; i < users_size; i++) {
+            if (user_role[i] == 2)
+                return true;
+            if (user_role[i] == 3 && idx == 2)
+                return true;
         }
         return false;
     }
@@ -154,25 +211,27 @@ public class Main {
         }
         System.out.println("\n\n");
         int idActivity = scanner.nextInt();
-        int locActivity = findById(idActivity, activity_id, activities_size);
+        if (!checkUserAvailability(idActivity)) {
+            System.err.println("Ocorreu um erro: Não há usuário apto a ser associado a essa atividade.");
+            return;
+        }
         System.out.println("Escolher a identificação do recurso a ser alocado: \n");
         for (int i = 0; i < resources_size; i++) {
             System.out.println(resource_id[i] + " - " + resource_name[i]);
         }
         System.out.println("\n\n");
-        int idResource = scanner.nextInt();
-        int locResource = findById(idResource, resource_id, resources_size);
-        System.out.println("Escolha agora a identificação do usuário responsável por essa alocação (somente são exibidos professores e pesquisadores):\n");
-        for (int i = 0; i < resources_size; i++) {
-            if (user_role[i] > 1) {
-                System.out.println(user_id[i] + " - " + user_name[i]);
+        int idResource = scanner.nextInt(), idUser;
+        System.out.println("Escolha agora a identificação do usuário responsável por essa alocação (somente são exibidos os usuários que atendem aos requisitos de alocação):\n");
+        for (int i = 0; i < users_size; i++) {
+            if (user_role[i] > 1 ) {
+                if (user_role[i] != 3 || (user_role[i] == 3 && activity_type[findById(idActivity, activity_id, activities_size)] == 2))
+                    System.out.println(user_id[i] + " - " + user_name[i]);
             }
         }
         System.out.println("\n\n");
-        int idUser = scanner.nextInt();
+        idUser = scanner.nextInt();
         scanner.nextLine();
-        int locUser = findById(idUser, user_id, users_size);
-        Date inicio = null, fim = null;
+        Date inicio, fim;
         while (true) {
             System.out.println("Agora informe a data de início da alocação (DD/MM/AAAA HH:MM):\n");
             String dataInicio = scanner.nextLine();
@@ -181,7 +240,7 @@ public class Main {
                 inicio = sdf.parse(dataInicio);
             } catch (ParseException e) {
                 e.printStackTrace();
-                return;
+                continue;
             }
             System.out.println("A data de fim da alocação (DD/MM/AAAA HH:MM):\n");
             String dataFim = scanner.nextLine();
@@ -189,16 +248,19 @@ public class Main {
                 fim = sdf.parse(dataFim);
             } catch (ParseException e) {
                 e.printStackTrace();
-                return;
+                continue;
             }
-            if (checkIfDateCollides(inicio, fim, idResource)) {
+            if (checkIfDateCollides(inicio, fim, idResource, allocation_resource_id)) {
                 System.out.println("Esse recurso já está alocado no horário selecionado. Deseja tentar outro horário? (S/N)");
                 String go = scanner.nextLine();
                 if (go.equals("N"))
                     return;
-            }
-            else
+            } else
                 break;
+        }
+        if (checkIfDateCollides(inicio, fim, idUser, allocation_resource_owner_id)) {
+            System.out.println("O usuário selecionado está ocupado nesse horário. Não é possível alocá-lo. Favor refazer o processo escolhendo um outro horário.");
+            return;
         }
         int id = allocation_ids_control.getAndIncrement();
         allocation_id[allocations_size] = id;
@@ -206,14 +268,75 @@ public class Main {
         allocation_activity_id[allocations_size] = idActivity;
         allocation_startDate[allocations_size] = inicio;
         allocation_endDate[allocations_size] = fim;
-        allocation_status[allocations_size] = "teste";
+        allocation_status[allocations_size] = "Em processo de alocação";
+        allocation_resource_owner_id[allocations_size] = idUser;
         allocations_size++;
         System.out.println("\n\nA alocação foi feita com sucesso.\nFoi gerada a identificação " + id + ".\n");
         System.out.println("\nPressione ENTER para retornar ao Menu Principal");
         scanner.nextLine();
         System.out.println("\n\n");
     }
+    static String getActivityTypeDescriptionById(int id) {
+        switch (id) {
+            case 1:
+                return "Aula Tradicional";
+            case 2:
+                return "Laboratório";
+            case 3:
+                return "Apresentação";
+            default:
+                return "Sem Tipo";
+        }
+    }
+    static void queryUser() {
+        if (users_size == 0) {
+            System.out.println("\n\nOcorreu um erro: não há usuários cadastrados no sistema, não é possível consultar usuários.\n\n");
+            return;
+        }
+        System.out.println("Consulta Usuário\n");
+        for (int i = 0; i < users_size; i++) {
+            System.out.println(user_id[i] + " - " + user_name[i]);
+        }
+        System.out.println("Selecione uma identificação de usuário:");
+        int id = scanner.nextInt();
+        int pos = findById(id, user_id, users_size);
+        System.out.println("Nome do usuário: " + user_name[pos]);
+        System.out.println("E-mail do usuário: " + user_email[pos]);
+        System.out.println("Histórico:\n");
+        System.out.println("Atividades realizadas: ");
+        boolean entrou = false;
+        for (int i = 0; i < allocations_size; i++) {
+            if (allocation_resource_owner_id[i] == id) {
+                entrou = true;
+                int loc = findById(allocation_activity_id[i], activity_id, activities_size);
+                System.out.println("Atividade #" + activity_id[loc] + " - " + activity_title[loc]);
+                System.out.println("Descrição: " + activity_desc[loc]);
+                System.out.println("Tipo: " + getActivityTypeDescriptionById(activity_type[loc]));
+                System.out.println();
+            }
+        }
+        if (!entrou) {
+            System.out.println("Nenhuma atividade foi realizada por esse usuário.");
+        }
+        entrou = false;
+        System.out.println("Recursos Alocados:");
+        for (int i = 0; i < allocations_size; i++) {
+            if (allocation_resource_owner_id[i] == id) {
+                entrou = true;
+                int loc = findById(allocation_resource_id[i], resource_id, resources_size);
+                System.out.println("Recurso #" + resource_id[loc] + " - " + resource_name[loc]);
+                System.out.println();
+            }
+        }
+        if (!entrou) {
+            System.out.println("Nenhum recurso foi alocado por esse usuário.");
+        }
+        System.out.println("\nPressione ENTER para retornar ao Menu Principal");
+        scanner.nextLine();
+        scanner.nextLine();
+    }
     public static void main(String[] args) {
+        scanner = new Scanner(System.in);
         boolean exit = false;
         while (true) {
             int option = displayMenu();
@@ -232,6 +355,15 @@ public class Main {
                     allocation();
                     break;
                 case 5:
+                    queryUser();
+                    break;
+                case 6:
+                    //queryResource();
+                    break;
+                case 7:
+                    //report();
+                    break;
+                case 8:
                     exit = true;
                     break;
             }
