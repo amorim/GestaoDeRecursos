@@ -46,6 +46,7 @@ public class Main {
     public static String[] activity_desc = new String[MAX];
     public static int[][] activity_users = new int[MAX][MAX];
     public static int[] activity_type = new int[MAX];
+    public static String[] activity_material = new String[MAX];
     public static int activity_users_size;
     public static int activities_size;
     public static AtomicInteger activity_ids_control = new AtomicInteger(1000);
@@ -101,6 +102,8 @@ public class Main {
         String title = scanner.nextLine();
         System.out.println("Informar breve descrição da atividade:");
         String desc = scanner.nextLine();
+        System.out.println("Informe os materias que serão usados nessa atividade:");
+        String stuff = scanner.nextLine();
         System.out.println("Qual o tipo da atividade? (1 para aula tradicional, 2 para apresentações e 3 para laboratório)");
         int type = scanner.nextInt();
         System.out.println("Selecione agora os usuários que participarão dessa atividade:\n");
@@ -128,6 +131,7 @@ public class Main {
         activity_title[activities_size] = title;
         activity_desc[activities_size] = desc;
         activity_type[activities_size] = type;
+        activity_material[activities_size] = stuff;
         activities_size++;
         System.out.println("\n\nAtividade \"" + title + "\" cadastrada com sucesso.\nFoi gerada a identificação " + id + ".\n");
         System.out.println("Você deseja alocar recursos para essa atividade? (S/N)\n");
@@ -246,7 +250,7 @@ public class Main {
             if (array[i] == id) {
                 Date startB = allocation_startDate[i];
                 Date endB = allocation_endDate[i];
-                if ((startA.before(endB) || startA.equals(endB)) && ((endA.after(startB)) || endA.equals(startB))) {
+                if (!startA.after(endB) && !endA.before(startB)) {
                     return true;
                 }
             }
@@ -334,7 +338,7 @@ public class Main {
                 e.printStackTrace();
                 continue;
             }
-            if (inicio.after(fim) || inicio.equals(fim)) {
+            if (!inicio.before(fim)) {
                 System.out.println("Datas inválidas. Favor selecionar corretamente.");
                 continue;
             }
@@ -407,6 +411,7 @@ public class Main {
                 int loc = findById(allocation_activity_id[i], activity_id, activities_size);
                 System.out.println("Atividade #" + activity_id[loc] + " - " + activity_title[loc]);
                 System.out.println("Descrição: " + activity_desc[loc]);
+                System.out.println("Materiais: " + activity_material[loc]);
                 System.out.println("Tipo: " + getActivityTypeDescriptionById(activity_type[loc]));
                 System.out.println();
             }
