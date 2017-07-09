@@ -102,7 +102,7 @@ public class Main {
         String title = scanner.nextLine();
         System.out.println("Informar breve descrição da atividade:");
         String desc = scanner.nextLine();
-        System.out.println("Informe os materias que serão usados nessa atividade:");
+        System.out.println("Informe os materiais que serão usados nessa atividade:");
         String stuff = scanner.nextLine();
         System.out.println("Qual o tipo da atividade? (1 para aula tradicional, 2 para apresentações e 3 para laboratório)");
         int type = scanner.nextInt();
@@ -137,6 +137,7 @@ public class Main {
         System.out.println("Você deseja alocar recursos para essa atividade? (S/N)\n");
         if (scanner.nextLine().equals("S")) {
             newAllocation();
+            return;
         }
         System.out.println("Pressione ENTER para retornar ao Menu Principal");
         scanner.nextLine();
@@ -186,10 +187,16 @@ public class Main {
         int num = fromStringToId(status);
         if (newstatus != num + 1) {
             System.out.println("Seleção inválida. Você deve escolher um status imediatamente posterior ao atual.");
+            System.out.println("\nPressione ENTER para retornar ao Menu Principal");
+            scanner.nextLine();
+            scanner.nextLine();
             return;
         }
         if ((newstatus == 1 && !checkForBasicInformation(pos)) || (newstatus == 3 && !checkForActivityDescription(pos))) {
             System.out.println("Não foram cumpridos os requisitos para essa alteração de status. Tente novamente depois de cumpri-los.");
+            System.out.println("\nPressione ENTER para retornar ao Menu Principal");
+            scanner.nextLine();
+            scanner.nextLine();
             return;
         }
         allocation_status[pos] = fromIdToString(newstatus);
@@ -296,7 +303,6 @@ public class Main {
         for (int i = 0; i < activities_size; i++) {
             System.out.println(activity_id[i] + " - " + activity_title[i]);
         }
-        System.out.println("\n\n");
         int idActivity = scanner.nextInt();
         if (!checkUserAvailability(idActivity)) {
             System.out.println("Ocorreu um erro: Não há usuário apto a ser associado a essa atividade.");
@@ -306,7 +312,6 @@ public class Main {
         for (int i = 0; i < resources_size; i++) {
             System.out.println(resource_id[i] + " - " + resource_name[i]);
         }
-        System.out.println("\n\n");
         int idResource = scanner.nextInt(), idUser;
         System.out.println("Escolha agora a identificação do usuário responsável por essa alocação (somente são exibidos os usuários que atendem aos requisitos de alocação):\n");
         for (int i = 0; i < users_size; i++) {
@@ -316,7 +321,6 @@ public class Main {
                 }
             }
         }
-        System.out.println("\n\n");
         idUser = scanner.nextInt();
         scanner.nextLine();
         Date inicio, fim;
@@ -403,7 +407,7 @@ public class Main {
         System.out.println("\nNome do usuário: " + user_name[pos]);
         System.out.println("E-mail do usuário: " + user_email[pos]);
         System.out.println("\nHistórico:\n");
-        System.out.println("Atividades realizadas: ");
+        System.out.println("Atividades realizadas:\n");
         boolean entrou = false;
         for (int i = 0; i < allocations_size; i++) {
             if (allocation_resource_owner_id[i] == id) {
@@ -416,11 +420,12 @@ public class Main {
                 System.out.println();
             }
         }
+        System.out.println();
         if (!entrou) {
             System.out.println("Nenhuma atividade foi realizada por esse usuário.");
         }
         entrou = false;
-        System.out.println("Recursos Alocados:");
+        System.out.println("Recursos Alocados:\n");
         for (int i = 0; i < allocations_size; i++) {
             if (allocation_resource_owner_id[i] == id) {
                 entrou = true;
