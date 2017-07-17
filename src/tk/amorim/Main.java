@@ -53,17 +53,16 @@ public class Main {
     public static AtomicInteger activity_ids_control = new AtomicInteger(1000);
     //endregion
 
-    static void printBlankLines() {
+    private static void printBlankLines() {
         System.out.print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
     }
-
-    static int displayMenu() {
+    private static int displayMenu() {
         printBlankLines();
         System.out.println("Bem-vindo ao sistema\n\n\nEscolha uma opção:\n\n1. Cadastro de Usuários\n2. Criar uma Atividade\n3. Cadastrar um recurso\n4. Alocações\n5. Consulta Usuário\n6. Consulta Recurso\n7. Emitir Relatório\n8. Sair");
         return scanner.nextInt();
     }
 
-    static boolean findCPF(String cpf) {
+    private static boolean findCPF(String cpf) {
         for (int i = 0; i < users_size; i++) {
             if (user_cpf[i].equalsIgnoreCase(cpf))
                 return true;
@@ -71,7 +70,7 @@ public class Main {
         return false;
     }
 
-    static void registerUser() {
+    private static void registerUser() {
         printBlankLines();
         System.out.print("Cadastro de Usuário\n\n\nFavor informar o nome do usuário:\n");
         String username = scanner.nextLine();
@@ -101,7 +100,7 @@ public class Main {
         scanner.nextLine();
     }
 
-    static boolean checkIfUserIsAlreadyAdded(int id) {
+    private static boolean checkIfUserIsAlreadyAdded(int id) {
         for (int i = 0; i < activity_users_size; i++) {
             if (activity_users[activities_size][i] == id)
                 return true;
@@ -109,7 +108,7 @@ public class Main {
         return false;
     }
 
-    static void createActivity() {
+    private static void createActivity() {
         printBlankLines();
         if (users_size == 0) {
             System.out.println("Ocorreu um erro: não há usuários cadastrados no sistema, não é possível cadastrar uma atividade.");
@@ -133,6 +132,10 @@ public class Main {
             }
             System.out.println("\nInsira o ID desejado:");
             int id = scanner.nextInt();
+            if (findById(id, user_id, users_size) == -1) {
+                System.out.println("ID inválido. Favor selecionar uma das identificações listadas.");
+                continue;
+            }
             if (checkIfUserIsAlreadyAdded(id)) {
                 System.out.println("Este usuário já está adicionado nessa atividade.");
             } else {
@@ -140,7 +143,7 @@ public class Main {
             }
             scanner.nextLine();
             System.out.println("Adicionar mais usuários? (S/N)\n");
-            if (scanner.nextLine().equals("N")) {
+            if (scanner.nextLine().equalsIgnoreCase("N")) {
                 break;
             }
         }
@@ -162,7 +165,7 @@ public class Main {
         scanner.nextLine();
     }
 
-    static void registerResource() {
+    private static void registerResource() {
         printBlankLines();
         System.out.println("Cadastrar um Recurso\n\n\nInformar o nome do recurso:");
         String name = scanner.nextLine();
@@ -175,7 +178,7 @@ public class Main {
         scanner.nextLine();
     }
 
-    static void allocation() {
+    private static void allocation() {
         printBlankLines();
         System.out.println("Bem-Vindo ao Menu de Alocações.\n\n\n");
         System.out.println("Escolha uma opção:\n\n");
@@ -189,7 +192,7 @@ public class Main {
         }
     }
 
-    static void manageAllocation() {
+    private static void manageAllocation() {
         printBlankLines();
         System.out.println("Gerenciar Alocação\n");
         System.out.println("Selecione uma identificação de alocação:");
@@ -199,6 +202,12 @@ public class Main {
             }
         }
         int id = scanner.nextInt();
+        if (findById(id, allocation_id, allocations_size) == -1) {
+            System.out.println("ID inválido. Verifique sua seleção.");
+            System.out.println("\nPressione ENTER para retornar ao Menu Principal");
+            scanner.nextLine();
+            scanner.nextLine();
+        }
         System.out.println("Escolha o novo status da alocação: (1 para \"alocado\", 2 para \"em andamento\" e 3 para \"concluído\")");
         int newstatus = scanner.nextInt();
         int pos = findById(id, allocation_id, allocations_size);
@@ -225,15 +234,15 @@ public class Main {
         scanner.nextLine();
     }
 
-    static boolean checkForBasicInformation(int pos) {
+    private static boolean checkForBasicInformation(int pos) {
         return allocation_startDate[pos] != null && allocation_endDate[pos] != null && allocation_resource_id[pos] != 0 && allocation_resource_owner_id[pos] != 0 && allocation_activity_id[pos] != 0;
     }
 
-    static boolean checkForActivityDescription(int pos) {
+    private static boolean checkForActivityDescription(int pos) {
         return !activity_desc[findById(allocation_activity_id[pos], activity_id, activities_size)].isEmpty();
     }
 
-    static int fromStringToId(String string) {
+    private static int fromStringToId(String string) {
         if (string.startsWith("Em proc")) {
             return 0;
         }
@@ -246,7 +255,7 @@ public class Main {
         return 3;
     }
 
-    static String fromIdToString(int id) {
+    private static String fromIdToString(int id) {
         switch (id) {
             case 0:
                 return "Em processo de alocação";
@@ -260,7 +269,7 @@ public class Main {
         return "Erro";
     }
 
-    static int findById(int id, int[] array, int tam) {
+    private static int findById(int id, int[] array, int tam) {
         for (int i = 0; i < tam; i++) {
             if (array[i] == id)
                 return i;
@@ -268,7 +277,7 @@ public class Main {
         return -1;
     }
 
-    static boolean checkForPrivilegedUsers() {
+    private static boolean checkForPrivilegedUsers() {
         for (int role : user_role) {
             if (role > 1)
                 return true;
@@ -276,7 +285,7 @@ public class Main {
         return false;
     }
 
-    static boolean checkIfDateCollides(Date startA, Date endA, int id, int array[]) {
+    private static boolean checkIfDateCollides(Date startA, Date endA, int id, int array[]) {
         for (int i = 0; i < allocations_size; i++) {
             if (array[i] == id) {
                 Date startB = allocation_startDate[i];
@@ -289,7 +298,7 @@ public class Main {
         return false;
     }
 
-    static boolean checkUserAvailability(int id) {
+    private static boolean checkUserAvailability(int id) {
         int idx = activity_type[findById(id, activity_id, activities_size)];
         for (int i = 0; i < users_size; i++) {
             if (user_role[i] == 2) {
@@ -302,7 +311,7 @@ public class Main {
         return false;
     }
 
-    static void newAllocation() {
+    private static void newAllocation() {
         printBlankLines();
         System.out.println("Nova Alocação\n\n\n");
         if (activities_size == 0) {
@@ -328,6 +337,7 @@ public class Main {
             System.out.println(activity_id[i] + " - " + activity_title[i]);
         }
         int idActivity = scanner.nextInt();
+
         if (!checkUserAvailability(idActivity)) {
             System.out.println("Ocorreu um erro: Não há usuário apto a ser associado a essa atividade.");
             return;
@@ -400,7 +410,7 @@ public class Main {
         scanner.nextLine();
     }
 
-    static String getActivityTypeDescriptionById(int id) {
+    private static String getActivityTypeDescriptionById(int id) {
         switch (id) {
             case 1:
                 return "Aula Tradicional";
@@ -413,7 +423,7 @@ public class Main {
         }
     }
 
-    static void queryUser() {
+    private static void queryUser() {
         printBlankLines();
         if (users_size == 0) {
             System.out.println("Ocorreu um erro: não há usuários cadastrados no sistema, não é possível consultar usuários.");
@@ -466,7 +476,7 @@ public class Main {
         scanner.nextLine();
     }
 
-    static void queryResource() {
+    private static void queryResource() {
         printBlankLines();
         if (resources_size == 0) {
             System.out.println("\n\nOcorreu um erro: não há recursos cadastrados no sistema, não é possível consultar recursos.\n\n");
@@ -505,7 +515,7 @@ public class Main {
         scanner.nextLine();
     }
 
-    static boolean notPresent(int idToFind, int[] array, int tam) {
+    private static boolean notPresent(int idToFind, int[] array, int tam) {
         for (int i = 0; i < tam; i++) {
             if (array[i] == idToFind) {
                 return false;
@@ -514,7 +524,7 @@ public class Main {
         return true;
     }
 
-    static void report() {
+    private static void report() {
         printBlankLines();
         System.out.println("Relatório do sistema");
         System.out.println();
