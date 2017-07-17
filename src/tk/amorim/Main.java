@@ -35,6 +35,7 @@ public class Main {
     public static int[] user_id = new int[MAX];
     public static String[] user_name = new String[MAX];
     public static String[] user_email = new String[MAX];
+    public static String[] user_cpf = new String[MAX];
     public static int[] user_role = new int[MAX];
     public static int users_size;
     public static AtomicInteger user_ids_control = new AtomicInteger(1000);
@@ -62,12 +63,29 @@ public class Main {
         return scanner.nextInt();
     }
 
+    static boolean findCPF(String cpf) {
+        for (int i = 0; i < users_size; i++) {
+            if (user_cpf[i].equalsIgnoreCase(cpf))
+                return true;
+        }
+        return false;
+    }
+
     static void registerUser() {
         printBlankLines();
         System.out.print("Cadastro de Usuário\n\n\nFavor informar o nome do usuário:\n");
         String username = scanner.nextLine();
         System.out.println("Informe o e-mail do usuário:");
         String email = scanner.nextLine();
+        String cpf = "";
+        System.out.println("Informe o CPF do Usuário: ");
+        cpf = scanner.nextLine();
+        if (findCPF(cpf)) {
+            System.out.println("Este CPF já está cadastrado. Verifique.");
+            System.out.println("Pressione ENTER para retornar ao Menu Principal");
+            scanner.nextLine();
+            return;
+        }
         System.out.print("Favor informar o tipo de usuário (1 para aluno, 2 para professor, 3 para pesquisador):\n");
         int role = scanner.nextInt();
         int id = user_ids_control.getAndIncrement();
@@ -75,6 +93,7 @@ public class Main {
         user_name[users_size] = username;
         user_role[users_size] = role;
         user_email[users_size] = email;
+        user_cpf[users_size] = cpf;
         users_size++;
         System.out.println("\n\nUsuário " + username + " cadastrado com sucesso. \nFoi gerada a identificação " + id + ". \nVocê pode obter essa identificação posteriormente pelo sistema de busca.");
         System.out.println("\nPressione ENTER para retornar ao Menu Principal");
@@ -205,12 +224,15 @@ public class Main {
         scanner.nextLine();
         scanner.nextLine();
     }
+
     static boolean checkForBasicInformation(int pos) {
         return allocation_startDate[pos] != null && allocation_endDate[pos] != null && allocation_resource_id[pos] != 0 && allocation_resource_owner_id[pos] != 0 && allocation_activity_id[pos] != 0;
     }
+
     static boolean checkForActivityDescription(int pos) {
         return !activity_desc[findById(allocation_activity_id[pos], activity_id, activities_size)].isEmpty();
     }
+
     static int fromStringToId(String string) {
         if (string.startsWith("Em proc")) {
             return 0;
@@ -223,6 +245,7 @@ public class Main {
         }
         return 3;
     }
+
     static String fromIdToString(int id) {
         switch (id) {
             case 0:
@@ -236,6 +259,7 @@ public class Main {
         }
         return "Erro";
     }
+
     static int findById(int id, int[] array, int tam) {
         for (int i = 0; i < tam; i++) {
             if (array[i] == id)
