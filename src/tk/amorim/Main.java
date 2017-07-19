@@ -48,11 +48,45 @@ public class Main {
     public static int[][] activity_users = new int[MAX][MAX];
     public static int[] activity_type = new int[MAX];
     public static String[] activity_material = new String[MAX];
-    public static int activity_users_size;
+    public static int[] activity_users_size = new int[MAX];
     public static int activities_size;
     public static AtomicInteger activity_ids_control = new AtomicInteger(1000);
     //endregion
+    private static void loadData() {
+        user_name[0] = "Lucas";
+        user_cpf[0] = "33364372888";
+        user_email[0] = "lucas@email.com";
+        user_id[0] = user_ids_control.getAndIncrement();
+        user_role[0] = 2;
+        users_size = 1;
 
+        resource_name[0] = "Projetor";
+        resource_id[0] = resource_ids_control.getAndIncrement();
+        resources_size = 1;
+
+        activity_title[0] = "Aula 1";
+        activity_desc[0] = "Aula de apresentação do curso";
+        activity_material[0] = "Lápis e Borracha";
+        activity_type[0] = 1;
+        activity_id[0] = activity_ids_control.getAndIncrement();
+        activity_users[0][0] = user_id[0];
+        activity_users_size[0] = 1;
+        activities_size = 1;
+
+        allocation_activity_id[0] = activity_id[0];
+        allocation_resource_owner_id[0] = user_id[0];
+        try {
+            allocation_startDate[0] = new SimpleDateFormat("dd/MM/yyyy HH:mm").parse("20/07/2017 14:00");
+            allocation_endDate[0] = new SimpleDateFormat("dd/MM/yyyy HH:mm").parse("20/07/2017 15:00");
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        allocation_status[0] = "Em processo de alocação";
+        allocation_id[0] = allocation_ids_control.getAndIncrement();
+        allocation_resource_id[0] = resource_id[0];
+        allocations_size = 1;
+
+    }
     private static void printBlankLines() {
         System.out.print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
     }
@@ -76,7 +110,7 @@ public class Main {
         String username = scanner.nextLine();
         System.out.println("Informe o e-mail do usuário:");
         String email = scanner.nextLine();
-        String cpf = "";
+        String cpf;
         System.out.println("Informe o CPF do Usuário: ");
         cpf = scanner.nextLine();
         if (findCPF(cpf)) {
@@ -101,7 +135,7 @@ public class Main {
     }
 
     private static boolean checkIfUserIsAlreadyAdded(int id) {
-        for (int i = 0; i < activity_users_size; i++) {
+        for (int i = 0; i < activity_users_size[activities_size]; i++) {
             if (activity_users[activities_size][i] == id)
                 return true;
         }
@@ -139,7 +173,7 @@ public class Main {
             if (checkIfUserIsAlreadyAdded(id)) {
                 System.out.println("Este usuário já está adicionado nessa atividade.");
             } else {
-                activity_users[activities_size][activity_users_size++] = id;
+                activity_users[activities_size][activity_users_size[activities_size]++] = id;
             }
             scanner.nextLine();
             System.out.println("Adicionar mais usuários? (S/N)\n");
@@ -575,6 +609,7 @@ public class Main {
     }
 
     public static void main(String[] args) {
+        loadData();
         scanner = new Scanner(System.in);
         boolean exit = false;
         while (true) {
