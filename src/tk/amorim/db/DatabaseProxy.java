@@ -2,6 +2,8 @@ package tk.amorim.db;
 
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import tk.amorim.decorator.User;
+import tk.amorim.model.Activity;
+import tk.amorim.model.Resource;
 
 import java.util.ArrayList;
 
@@ -22,9 +24,9 @@ public class DatabaseProxy extends Database {
     private boolean checkCredentials() {
         return user.equalsIgnoreCase("admin") && password.equalsIgnoreCase("1234");
     }
-    public ArrayList<User> getUser(User filter) throws Exception {
+    public UserFiltering getUsers() throws Exception {
         if (validated)
-            return super.getUser(filter);
+            return super.getUsers();
         throw new Exception("Not authenticated");
     }
     public int getUniqueIdForInstance() throws Exception {
@@ -33,8 +35,30 @@ public class DatabaseProxy extends Database {
         throw new Exception("Not authenticated");
     }
     public void addUser(User user) throws Exception {
-        if (validated)
+        if (validated) {
             super.addUser(user);
+            return;
+        }
+        throw new Exception("Not authenticated");
+    }
+    public void addActivity(Activity activity) throws Exception {
+        if (validated) {
+            super.addActivity(activity);
+            return;
+        }
+        throw new Exception("Not authenticated");
+    }
+    public ActivityFiltering getActivities() throws Exception {
+        if (validated) {
+            return super.getActivities();
+        }
+        throw new Exception("Not authenticated");
+    }
+    public void addResource(Resource res) throws Exception {
+        if (validated) {
+            super.addResource(res);
+            return;
+        }
         throw new Exception("Not authenticated");
     }
 }

@@ -8,6 +8,10 @@ import tk.amorim.decorator.User;
 public class Teacher extends UserDecorator {
     public Teacher(User user) {
         super(user);
+        name = user.name;
+        email = user.email;
+        cpf = user.cpf;
+        id = user.id;
         permission = Permission.TEACHER;
     }
 }

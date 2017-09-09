@@ -1,19 +1,21 @@
 package tk.amorim.decorator;
 
-import java.util.Comparator;
+import java.util.ArrayList;
 
 /**
  * Created by lucas on 01/09/2017.
  */
 public class User {
-    private int id;
-    private String name;
-    private String email;
-    private String cpf;
+    int id;
+    String name;
+    String email;
+    String cpf;
     Permission permission;
 
-    public Permission getPermissionLevel() {
-        return permission;
+    public ArrayList<Permission> getPermissionLevel() {
+        ArrayList<Permission> perm = new ArrayList<>();
+        perm.add(permission);
+        return perm;
     }
 
 
@@ -49,8 +51,11 @@ public class User {
         this.cpf = cpf;
     }
 
-    @Override
-    public boolean equals(Object other) {
-       return ((User)other).getCpf().equals(cpf);
+    public User toRole(int role) {
+        if (role == 1)
+            return new Student(this);
+        if (role == 2)
+            return new Teacher(this);
+        return new Researcher(this);
     }
 }
