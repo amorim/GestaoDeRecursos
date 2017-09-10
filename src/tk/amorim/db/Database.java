@@ -1,23 +1,21 @@
 package tk.amorim.db;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import tk.amorim.decorator.User;
 import tk.amorim.model.Activity;
+import tk.amorim.model.Allocation;
 import tk.amorim.model.Resource;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
-
 /**
  * Created by lucas on 01/09/2017.
  */
 public abstract class Database {
     private AtomicInteger atomic = new AtomicInteger(1000);
-    private ArrayList<User> users = new ArrayList<User>();
+    private ArrayList<User> users = new ArrayList<>();
     private ArrayList<Activity> activities = new ArrayList<>();
     private ArrayList<Resource> resources = new ArrayList<>();
+    private ArrayList<Allocation> allocations = new ArrayList<>();
 
     public UserFiltering getUsers() throws Exception {
         return new UserFiltering(users);
@@ -37,5 +35,14 @@ public abstract class Database {
 
     public void addResource(Resource res) throws Exception {
         resources.add(res);
+    }
+    public ArrayList<Resource> getResources() throws Exception {
+        return resources;
+    }
+    public void addAllocation(Allocation alloc) throws Exception {
+        allocations.add(alloc);
+    }
+    public ArrayList<Allocation> getAllocations() throws Exception {
+        return allocations;
     }
 }

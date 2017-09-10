@@ -7,9 +7,15 @@ import tk.amorim.model.Allocation;
  */
 public class InProgressAllocation extends Allocation implements IAllocationState {
 
-    public InProgressAllocation(Allocation alloc) {
+    InProgressAllocation(Allocation alloc) {
         super(alloc);
     }
+
+    @Override
+    public AllocationState getState() {
+        return AllocationState.IN_PROGRESS;
+    }
+
     @Override
     public IAllocationState go() {
         System.out.println("Passando Alocação do Status \"Em Andamento\" para \"Concluído\"");

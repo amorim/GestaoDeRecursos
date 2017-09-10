@@ -1,19 +1,26 @@
 package tk.amorim.model;
 
 import tk.amorim.decorator.User;
+import tk.amorim.state.AllocationState;
+import tk.amorim.state.IAllocationState;
 
 import java.util.Date;
 
 /**
  * Created by lucas on 01/09/2017.
  */
-public abstract class Allocation {
+public abstract class Allocation implements IAllocationState {
     private int id;
     private Date start;
     private Date end;
     private Activity activity;
     private Resource resource;
     private User owner;
+    private AllocationState state;
+
+    protected Allocation() {
+
+    }
 
     public Allocation(Allocation alloc) {
         this.id = alloc.getId();
@@ -71,4 +78,6 @@ public abstract class Allocation {
     public void setOwner(User owner) {
         this.owner = owner;
     }
+
+    public abstract AllocationState getState();
 }

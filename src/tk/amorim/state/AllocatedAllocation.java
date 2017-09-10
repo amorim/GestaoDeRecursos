@@ -7,8 +7,13 @@ import tk.amorim.model.Allocation;
  */
 public class AllocatedAllocation extends Allocation implements IAllocationState {
 
-    public AllocatedAllocation(Allocation alloc) {
+    AllocatedAllocation(Allocation alloc) {
         super(alloc);
+    }
+
+    @Override
+    public AllocationState getState() {
+        return AllocationState.ALLOCATED;
     }
 
     @Override

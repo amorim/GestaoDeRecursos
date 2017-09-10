@@ -7,8 +7,13 @@ import tk.amorim.model.Allocation;
  */
 public class PendingAllocation extends Allocation implements IAllocationState {
 
-    public PendingAllocation(Allocation alloc) {
-        super(alloc);
+    public PendingAllocation() {
+
+    }
+
+    @Override
+    public AllocationState getState() {
+        return AllocationState.PENDING;
     }
 
     @Override

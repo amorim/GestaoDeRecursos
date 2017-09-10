@@ -11,12 +11,17 @@ import java.util.stream.Collectors;
 public class ActivityFiltering implements Filtering<Activity> {
     private List<Activity> activities;
 
-    public ActivityFiltering(List<Activity> activities) {
+    ActivityFiltering(List<Activity> activities) {
         this.activities = activities;
     }
 
     public ActivityFiltering byID(int id) {
         activities = activities.stream().filter(a -> a.getId() == id).collect(Collectors.toList());
+        return this;
+    }
+
+    public ActivityFiltering byType(int type) {
+        activities = activities.stream().filter(a -> a.getType() == type).collect(Collectors.toList());
         return this;
     }
 

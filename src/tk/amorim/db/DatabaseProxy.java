@@ -3,6 +3,7 @@ package tk.amorim.db;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import tk.amorim.decorator.User;
 import tk.amorim.model.Activity;
+import tk.amorim.model.Allocation;
 import tk.amorim.model.Resource;
 
 import java.util.ArrayList;
@@ -58,6 +59,25 @@ public class DatabaseProxy extends Database {
         if (validated) {
             super.addResource(res);
             return;
+        }
+        throw new Exception("Not authenticated");
+    }
+    public ArrayList<Resource> getResources() throws Exception {
+        if (validated)
+            return super.getResources();
+        throw new Exception("Not authenticated");
+    }
+
+    public void addAllocation(Allocation alloc) throws Exception {
+        if (validated) {
+            super.addAllocation(alloc);
+            return;
+        }
+        throw new Exception("Not authenticated");
+    }
+    public ArrayList<Allocation> getAllocations() throws Exception {
+        if (validated) {
+            return super.getAllocations();
         }
         throw new Exception("Not authenticated");
     }

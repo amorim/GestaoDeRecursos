@@ -62,4 +62,8 @@ public abstract class Activity {
     public void setUsers(List<User> users) {
         this.users = users;
     }
+
+    public abstract int getType();
+
+    public abstract String getTypeDesc();
 }

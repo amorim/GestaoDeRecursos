@@ -7,8 +7,13 @@ import tk.amorim.model.Allocation;
  */
 public class FinishedAllocation extends Allocation implements IAllocationState {
 
-    public FinishedAllocation(Allocation alloc) {
+    FinishedAllocation(Allocation alloc) {
         super(alloc);
+    }
+
+    @Override
+    public AllocationState getState() {
+        return AllocationState.FINISHED;
     }
 
     @Override
